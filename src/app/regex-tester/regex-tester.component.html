@@ -1,0 +1,103 @@
+<div class="container-fluid">
+  <br>
+  <div class="row title">
+    <H2>String Matcher</H2>
+  </div>
+  <div class="row title">
+    Finds or Replaces the matching string from a given regular expression
+  </div>
+  <br><br>
+  <div class="row">
+      <div class="col-sm-6">
+        Enter a regular expression, a string of text to check it against and press 'Submit'. 
+        You can either find the matching substring in the entered string, or replace the matching 
+        text with another string. Depending on which option you choose.
+        <br>
+        Enjoy.
+      </div>
+  </div>
+  <br><br>
+  <div class="row">
+    <div class="col">
+      <form class="my-form" (ngSubmit)="onSubmit()" #f="ngForm">
+        <mat-form-field class="full-width">
+          <input
+            matInput
+            required
+            name="regEx"
+            [(ngModel)]="formData.regeX"
+            #regEx="ngModel"
+            (change)="validateInput()"
+            placeholder="Enter Regex">
+        </mat-form-field>
+        <br>
+        <mat-form-field class="full-width">
+            <input
+              matInput
+              required
+              name="string"
+              [(ngModel)]="formData.string"
+              #string="ngModel"
+              placeholder="Enter String">
+        </mat-form-field>
+        <br>
+        <mat-form-field *ngIf="formData.radio === 'Replace'" class="full-width">
+          <input
+            matInput
+            required
+            name="replace"
+            [(ngModel)]="formData.replace"
+            #replace="ngModel"
+            placeholder="Enter Value to replace">
+      </mat-form-field>
+        <br>
+        <mat-radio-group
+          [(ngModel)]="formData.radio"
+          name="radio"
+          required
+          aria-label="Select an option">
+            <mat-radio-button 
+              value="Find"
+              checked>
+              Find</mat-radio-button> &nbsp;
+            <mat-radio-button 
+              value="Replace">
+              Replace</mat-radio-button>
+        </mat-radio-group>
+        <br>   
+        <button type="submit" 
+          mat-raised-button 
+          color="primary" 
+          [disabled]="f.invalid">Submit</button>
+        &nbsp;
+        <button 
+          type="button" 
+          mat-raised-button 
+          color="accent" 
+          (click)="clear()">Clear</button>
+      </form>
+    </div>
+    <div class="col">
+        <h4>Results:</h4>
+        <div *ngIf=results>
+          <span *ngFor="let letter of results" [innerHtml]="letter | safe: 'html'"></span>
+        </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col"></div>
+    <div class="col"></div>
+  </div>
+  <div class="row">
+    <div class="col"></div>
+    <div class="col"></div>
+  </div>
+  <div class="row">
+    <div class="col"></div>
+    <div class="col"></div>
+  </div>
+  <div class="row">
+    <div class="col"></div>
+    <div class="col"></div>
+  </div>
+</div>

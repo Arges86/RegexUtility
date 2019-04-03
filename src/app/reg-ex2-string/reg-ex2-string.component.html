@@ -1,0 +1,132 @@
+<div class="container-fluid">
+  <br>
+  <div class="row title">
+    <H2>String creator</H2>
+  </div>
+  <div class="row title">
+    Creates random string based off of supplied regular expression
+  </div>
+  <br><br>
+  <div class="row">
+      <div class="col-sm-6">
+        Enter a regular expression and press 'Submit'. Page will generate random strings until one matches the expression.
+        If the number of tries hits the limit set by the slider, then it stops trying to create a string that matches.
+        This uses pure brute force in generating the string.
+        <br>
+        All processing for the string generation is done in your browser, so no information is ever sent over the internet.
+        <br>
+        Once your string is gerenated, you can check it against the 'haveibeenpwned' database to see if this value 
+        has come up in any data breaches. More information on how that works can be found 
+        <a href="https://haveibeenpwned.com/API/v2#PwnedPasswords" target="_blank"> here</a>.
+      </div>
+  </div>
+  <br><br>
+  <div class="row">
+    <div class="col-sm-6">
+      <form class="my-form" (ngSubmit)="onSubmit()" #f="ngForm">
+        <mat-form-field class="customInput">
+          <input 
+            matInput
+            required
+            name="regEx"
+            [(ngModel)]="formData.regeX"
+            #regEx="ngModel"
+            (change)="validateInput()"
+            placeholder="Enter Regex">
+        </mat-form-field>
+        <button
+          type="submit"
+          mat-raised-button 
+          color="primary"
+          [disabled]="f.invalid">Submit</button>
+          &nbsp;
+          <button 
+            type="button"
+            mat-raised-button
+            color="accent"
+            (click)="clear()"
+          >Clear</button>
+          <br>
+        </form>
+        <div>
+          <mat-slider
+            class="slider"
+            thumbLabel
+            tickInterval="100"
+            [invert]="invert"
+            [max]="max"
+            [min]="min"
+            [step]="step"
+            [thumbLabel]="thumbLabel"
+            [tickInterval]="tickInterval"
+            [(ngModel)]="totalLoops"
+            name="totalLoops"
+            [vertical]="vertical">
+          </mat-slider>
+          <div class="smallText">
+              Number of tries creating regEx before failure: {{totalLoops | number}}
+          </div>
+        </div>
+
+      <div *ngIf=formData.regeX>
+        <br>
+        Regular Expression Getting Checked:
+        <br>
+        <pre>{{formData.regeX}}</pre>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="row">
+          <h4>Result:</h4>
+      </div>
+      <div *ngIf=formData.result>
+        <div class='row results'>
+          {{formData.result}}
+        </div>
+        <br><br>
+        <div class="row">
+          Check to see if this value has been exposed in a password breach
+          <br>
+          <button 
+          type="button"
+          mat-raised-button
+          color="accent"
+          (click)="checkPwd(formData.result)"
+        >Check</button>
+        </div>
+        <div class="row" *ngIf=count>
+            <br>
+            This password has been seen {{count | number}} times before 
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center" *ngIf=loading>
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div class="row justify-content-center" style="text-align: center;">
+    <div class="col-sm-6">
+      <div class="error">{{error}}</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-6">
+      <h4>Examples:</h4>
+      <br>
+      <div class="row" *ngFor='let example of examples'>
+        <div class="col-2 examples">{{example.type}}</div>
+        <div class="col-4 examples">{{example.value}}</div>
+        <div class="col-1 examples"><button 
+          mat-mini-fab
+          type="button"
+          (click)="try(example.value)"
+          color="primary">Try</button></div>
+        
+      </div>
+    </div>
+    <div class="col-sm-6"></div>
+  </div>
+</div>
