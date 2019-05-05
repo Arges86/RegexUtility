@@ -38,7 +38,7 @@
           type="submit"
           mat-raised-button 
           color="primary"
-          [disabled]="f.invalid">Submit</button>
+          [disabled]="f.invalid || invalid">Submit</button>
           &nbsp;
           <button 
             type="button"
@@ -48,26 +48,6 @@
           >Clear</button>
           <br>
         </form>
-        <div>
-          <mat-slider
-            class="slider"
-            thumbLabel
-            tickInterval="100"
-            [invert]="invert"
-            [max]="max"
-            [min]="min"
-            [step]="step"
-            [thumbLabel]="thumbLabel"
-            [tickInterval]="tickInterval"
-            [(ngModel)]="totalLoops"
-            name="totalLoops"
-            [vertical]="vertical">
-          </mat-slider>
-          <div class="smallText">
-              Number of tries creating regEx before failure: {{totalLoops | number}}
-          </div>
-        </div>
-
       <div *ngIf=formData.regeX>
         <br>
         Regular Expression Getting Checked:
@@ -75,6 +55,7 @@
         <pre>{{formData.regeX}}</pre>
       </div>
     </div>
+
     <div class="col-sm-6">
       <div class="row">
           <h4>Result:</h4>

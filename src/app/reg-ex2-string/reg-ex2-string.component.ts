@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import * as sha1 from 'js-sha1';
+import * as RandExp from 'randexp';
 
 import { Utils } from '../services/utils.component';
 import { Rest } from '../services/rest.component';
@@ -15,17 +16,11 @@ export class RegEx2StringComponent implements OnInit {
   // tslint:disable-next-line: no-use-before-declare
   formData: FormData = new FormData();
   @ViewChild('f') form: any;
-  totalLoops = 100000;
-  invert = false;
-  max = 200000;
-  min = 100;
-  step = 10;
-  thumbLabel = false;
-  showTicks = false;
   error: string;
   loading: boolean;
   examples: object;
   count: string;
+  invalid = true;
 
   constructor(private utils: Utils, private rest: Rest) { }
 
@@ -34,7 +29,9 @@ export class RegEx2StringComponent implements OnInit {
       {type: 'Password', value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,12}$/ },
       {type: 'Password', value: /^[a-zA-Z]\w{3,14}$/},
       {type: 'Email', value: /[\w-]+@([\w-]+\.)+[\w-]+/},
-      {type: 'Username', value: /^[a-z0-9_-]{3,16}$/}
+      {type: 'Username', value: /^[a-z0-9_-]{3,16}$/},
+      // tslint:disable-next-line: max-line-length
+      {type: 'IPv4', value: /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/}
     ];
   }
 
@@ -43,11 +40,11 @@ export class RegEx2StringComponent implements OnInit {
     this.form.reset();
     this.error = null;
     this.count = null;
-    this.totalLoops = 100000;
   }
 
   try(example: string) {
     this.formData.regeX = new RegExp(example);
+    this.invalid = false;
     this.onSubmit();
   }
 
@@ -55,81 +52,21 @@ export class RegEx2StringComponent implements OnInit {
     this.loading = true;
     this.error = null;
     this.formData.result = '';
-    this.count = null;
-    console.log('Starting search...');
-    console.log(`Total number of attempts: ${this.totalLoops}`);
-
-    const regEx = new RegExp(this.formData.regeX);
-
-    this.createRegEx(regEx)
-      .then( res => {
-        console.log(res.match(regEx));
-        this.formData.result = res.match(regEx)['0'];
-        // this.formData.result = 'P@ssw0rd';
-      })
-      .catch( err => {
-        this.error = err;
-      })
-      .finally(() => {
-        console.log('done');
-        this.loading = false;
-      });
+    console.log(this.invalid);
+    const randexp = new RandExp(this.formData.regeX);
+    this.formData.result = randexp.gen();
+    this.loading = false;
   }
 
   validateInput() {
-    this.formData.regeX = this.utils.validateInput(this.formData.regeX);
-  }
-
-  createRegEx(reg: RegExp): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-
-    let r: string;
-    let returnedValue: string;
-
-    let x = 0;
-    let i: number;
-    let done: boolean;
-    do {
-        i = Math.floor((Math.random() * 100) + 1);
-        r = this.generateRandomString(i);
-        // console.log(r);
-        x++;
-
-        if (reg.test(r)) {
-          done = false;
-        } else {
-          done = true;
-        }
-
-        if (x > this.totalLoops) {
-          done = false;
-        } else {
-          returnedValue = r;
-        }
-
-      } while (done);
-
-    if (x < this.totalLoops) {
-      resolve(returnedValue);
-    } else {
-      const reason = new Error(`Gave up after ${x} tries`);
-      reject(reason);
+    try {
+      this.formData.regeX = this.utils.validateInput(this.formData.regeX);
+      this.invalid = false;
+    } catch (SyntaxError) {
+      console.log(SyntaxError);
+      this.error = 'Invalid Regular Expression';
+      this.invalid = true;
     }
-
-    console.log(`Took ${x} tries`);
-    });
-  }
-
-  generateRandomString(length: number) {
-    let randomString = '';
-    let randomAscii: number;
-    const asciiLow = 32;
-    const asciiHigh = 126;
-    for (let i = 0; i < length; i++) {
-        randomAscii = Math.floor((Math.random() * (asciiHigh - asciiLow)) + asciiLow);
-        randomString += String.fromCharCode(randomAscii);
-    }
-    return randomString;
   }
 
   checkPwd(pwd: string) {
